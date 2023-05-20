@@ -17,7 +17,7 @@ public class TextEncryption {
                     "15728E5A 8AACAA68 FFFFFFFF FFFFFFFF"), 16);
 
     public static String removeSpaces(String input) {
-        return input.replaceAll("\\s+", "");
+        return input.replaceAll("\\s+","");
     }
 
     private static final BigInteger g = new BigInteger("2");
@@ -81,7 +81,7 @@ public class TextEncryption {
             BigInteger c2 = publicKey.modPow(r, n).multiply(message).mod(n);
 
             // Füge die verschlüsselten Werte dem Ergebnisstring hinzu
-            sb.append("(").append(c1).append(",").append(c2).append("); ");
+            sb.append("(").append(c1).append(",").append(c2).append(");");
         }
         return sb.toString();
     }
