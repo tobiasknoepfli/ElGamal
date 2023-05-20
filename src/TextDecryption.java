@@ -16,7 +16,7 @@ public class TextDecryption {
                     "15728E5A 8AACAA68 FFFFFFFF FFFFFFFF"), 16);
 
     private static String removeSpaces(String input) {
-        return input.replaceAll("\\s+", "");
+        return input.replaceAll("\\s+","");
     }
 
     public static void main(String[] args) {
@@ -67,10 +67,10 @@ public class TextDecryption {
 
     private static String decryptText(String cipherText, BigInteger privateKey) {
         StringBuilder sb = new StringBuilder();
-        String[] cipherPairs = cipherText.split("; ");
+        String[] cipherPairs = cipherText.split(";");
         for (String pair : cipherPairs) {
-            pair = pair.trim().replace("(", "").replace(")", "");
-            String[] values = pair.split(", ");
+            pair = pair.trim().replace("(","").replace(")","");
+            String[] values = pair.split(",");
             BigInteger c1 = new BigInteger(values[0]);
             BigInteger c2 = new BigInteger(values[1]);
             BigInteger m = c2.multiply(c1.modPow(privateKey.negate(), n)).mod(n);
