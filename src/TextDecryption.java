@@ -2,6 +2,8 @@ import java.io.*;
 import java.math.BigInteger;
 
 public class TextDecryption {
+
+    //prepare n
     private static final BigInteger n = new BigInteger(TextEncryption.removeSpaces(
             "FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 " +
                     "29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD " +
@@ -20,73 +22,80 @@ public class TextDecryption {
     }
 
     public static void main(String[] args) {
-        String downloadPath = System.getProperty("user.home") + File.separator + "Downloads";
 
-        // Lese den privaten Schlüssel aus der Datei sk.txt ein
-        BigInteger privateKey = readKeyFromFile(downloadPath + File.separator + "sk.txt");
+        //create path
+        String dlPath = System.getProperty("user.home") + File.separator + "Downloads";
 
-        // Lese die verschlüsselte Nachricht aus der Datei chiffre.txt ein
-        String cipherText = readTextFromFile(downloadPath + File.separator + "chiffre.txt");
+        //read private key from file sk.txt
+        BigInteger privateKey = readKeyFromFile(dlPath + File.separator + "sk.txt");
 
-        // Entschlüssle die Nachricht gemäß dem ElGamal-Verfahren
-        String decryptedText = decryptText(cipherText, privateKey);
+        //read encrypted text from chiffre.txt
+        String text = readTextFromFile(dlPath + File.separator + "chiffre.txt");
 
-        // Speichere den entschlüsselten Text in der Datei text-d.txt
-        saveTextToFile(decryptedText, downloadPath + File.separator + "text-d.txt");
+        //decrypt text
+        String decryptedText = decryptText(text, privateKey);
+
+        //save decrypted text to text-d.txt
+        saveTextToFile(decryptedText, dlPath + File.separator + "text-d.txt");
     }
 
+    //method to read private key
     private static BigInteger readKeyFromFile(String filePath) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            String keyString = reader.readLine();
+            String key = reader.readLine();
             reader.close();
-            return new BigInteger(keyString);
+            return new BigInteger(key);
         } catch (IOException e) {
-            System.out.println("Fehler beim Lesen des Schlüssels aus der Datei '" + filePath + "'.");
+            System.out.println("error");
             e.printStackTrace();
             return null;
         }
     }
 
+    //method to read text from file
     private static String readTextFromFile(String filePath) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            StringBuilder sb = new StringBuilder();
+            StringBuilder strBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                sb.append(line);
+                strBuilder.append(line);
             }
             reader.close();
-            return sb.toString();
+            return strBuilder.toString();
         } catch (IOException e) {
-            System.out.println("Fehler beim Lesen der verschlüsselten Nachricht aus der Datei '" + filePath + "'.");
+            System.out.println("error");
             e.printStackTrace();
             return null;
         }
     }
 
+    //method to decrypt the encrypted text
     private static String decryptText(String cipherText, BigInteger privateKey) {
-        StringBuilder sb = new StringBuilder();
-        String[] cipherPairs = cipherText.split(";");
-        for (String pair : cipherPairs) {
+        StringBuilder strBuilder = new StringBuilder();
+        String[] pairs = cipherText.split(";");
+        for (String pair : pairs) {
             pair = pair.trim().replace("(", "").replace(")", "");
             String[] values = pair.split(",");
-            BigInteger c1 = new BigInteger(values[0]);
-            BigInteger c2 = new BigInteger(values[1]);
-            BigInteger m = c2.multiply(c1.modPow(privateKey.negate(), n)).mod(n);
-            sb.append((char) m.intValue());
+            BigInteger chr1 = new BigInteger(values[0]);
+            BigInteger chr2 = new BigInteger(values[1]);
+            BigInteger m = chr2.multiply(chr1.modPow(privateKey.negate(), n)).mod(n);
+            strBuilder.append((char) m.intValue());
         }
-        return sb.toString();
+        return strBuilder.toString();
     }
 
+
+    //method to save text to file
     private static void saveTextToFile(String text, String filePath) {
         try {
             FileWriter fileWriter = new FileWriter(filePath);
             fileWriter.write(text);
             fileWriter.close();
-            System.out.println("Der entschlüsselte Text wurde erfolgreich in der Datei '" + filePath + "' gespeichert.");
+            System.out.println("Saved to '" + filePath);
         } catch (IOException e) {
-            System.out.println("Fehler beim Speichern des entschlüsselten Texts in der Datei '" + filePath + "'.");
+            System.out.println("error");
             e.printStackTrace();
         }
     }
