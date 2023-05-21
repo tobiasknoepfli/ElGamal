@@ -26,19 +26,19 @@ public class TextEncryption {
     private static final BigInteger g = new BigInteger("2");
 
     public static void main(String[] args) {
-        String downloadPath = System.getProperty("user.home") + File.separator + "Downloads";
+        String dlPath = System.getProperty("user.home") + File.separator + "Downloads";
 
         //read public key from pk.txt
-        BigInteger publicKey = readKeyFromFile(downloadPath + File.separator + "pk.txt");
+        BigInteger publicKey = readKeyFromFile(dlPath + File.separator + "pk.txt");
 
         // read text from text.txt
-        String plainText = readTextFromFile(downloadPath + File.separator + "text.txt");
+        String text = readTextFromFile(dlPath + File.separator + "text.txt");
 
         // encrypt text
-        String cipherText = encryptText(plainText, publicKey);
+        String encryptedText = encryptText(text, publicKey);
 
         // save encrypted text in chiffre.txt
-        saveTextToFile(cipherText, downloadPath + File.separator + "chiffre.txt");
+        saveTextToFile(encryptedText, dlPath + File.separator + "chiffre.txt");
     }
 
     //method to read key from pk.txt
@@ -75,21 +75,21 @@ public class TextEncryption {
 
     //method to encrypt each character in text
     private static String encryptText(String plainText, BigInteger publicKey) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < plainText.length(); i++) {
-            char c = plainText.charAt(i);
-            int asciiCode = (int) c;
+            char chr = plainText.charAt(i);
+            int ascii = (int) chr;
 
             //encrypt message
-            BigInteger message = new BigInteger(Integer.toString(asciiCode));
-            BigInteger r = generateRandomNumberInRange(BigInteger.ONE, n.subtract(BigInteger.ONE));
-            BigInteger c1 = g.modPow(r, n);
-            BigInteger c2 = publicKey.modPow(r, n).multiply(message).mod(n);
+            BigInteger message = new BigInteger(Integer.toString(ascii));
+            BigInteger randInRange = generateRandomNumberInRange(BigInteger.ONE, n.subtract(BigInteger.ONE));
+            BigInteger chr1 = g.modPow(randInRange, n);
+            BigInteger chr2 = publicKey.modPow(randInRange, n).multiply(message).mod(n);
 
             // build final string
-            sb.append("(").append(c1).append(",").append(c2).append(");");
+            strBuilder.append("(").append(chr1).append(",").append(chr2).append(");");
         }
-        return sb.toString();
+        return strBuilder.toString();
     }
 
     //method to save the final text to a new file
