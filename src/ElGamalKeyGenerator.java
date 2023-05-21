@@ -8,6 +8,8 @@ import java.security.SecureRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ElGamalKeyGenerator {
+
+    //prepare and create n
     private static final BigInteger n = new BigInteger(removeSpaces(
             "FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 " +
                     "29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD " +
@@ -26,54 +28,59 @@ public class ElGamalKeyGenerator {
         return input.replaceAll("\\s+", "");
     }
 
-
+    //create g
     private static final BigInteger g = BigInteger.valueOf(2);
 
+    //generate the keys
     public static void main(String[] args) {
         generateElGamalKeys();
     }
 
+    //method to generate the keys
     public static void generateElGamalKeys() {
-        // Generiere privaten Schlüssel (zufällige Zahl zwischen 1 und n-1)
+        // generate a random BigInteger beween 1 and n-1 --> private key
         BigInteger privateKey = generateRandomNumberInRange(BigInteger.ONE, n.subtract(BigInteger.ONE));
 
-        // Berechne den dritten Teil des öffentlichen Schlüssels
+        // calculate the third part of the public key
         BigInteger publicKey = g.modPow(privateKey, n);
 
-        // Speichere den privaten Schlüssel in der Datei "sk.txt" im Download-Ordner
+        // save the private key to the file "sk.txt" in the user's download folder
         saveKeyToFile(privateKey, "sk.txt", getDownloadFolderPath());
 
-        // Speichere den öffentlichen Schlüssel in der Datei "pk.txt" im Download-Ordner
+        // save the public key to the file "pk.txt" in the user's download folder
         saveKeyToFile(publicKey, "pk.txt", getDownloadFolderPath());
     }
 
+    //method to generate a random number with BigInteger
     private static BigInteger generateRandomNumberInRange(BigInteger min, BigInteger max) {
-        SecureRandom random = new SecureRandom();
+        SecureRandom rnd = new SecureRandom();
         int bits = max.bitLength();
         BigInteger randomNumber;
         do {
-            randomNumber = new BigInteger(bits, random);
+            randomNumber = new BigInteger(bits, rnd);
         } while (randomNumber.compareTo(min) < 0 || randomNumber.compareTo(max) > 0);
         return randomNumber;
     }
 
+    //method to save a key to a file
     private static void saveKeyToFile(BigInteger key, String fileName, String folderPath) {
         try {
-            // Konvertiere den Schlüssel in Dezimaldarstellung
+            // convert to decimal
             String keyString = key.toString();
 
-            // Speichere den Schlüssel in einer Datei im Dezimalformat
+            //save the key in a file
             FileWriter fileWriter = new FileWriter(folderPath + "/" + fileName);
             fileWriter.write(keyString);
             fileWriter.close();
 
-            System.out.println("Der Schlüssel wurde erfolgreich in der Datei '" + fileName + "' gespeichert.");
+            System.out.println("saved at " + fileName);
         } catch (IOException e) {
-            System.out.println("Fehler beim Speichern des Schlüssels in der Datei '" + fileName + "'.");
+            System.out.println("error");
             e.printStackTrace();
         }
     }
 
+    //method to get download folder path
     private static String getDownloadFolderPath() {
         String userHome = System.getProperty("user.home");
         return userHome + "/Downloads";
