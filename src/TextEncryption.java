@@ -3,6 +3,8 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 public class TextEncryption {
+
+    //prepare n
     private static final BigInteger n = new BigInteger(removeSpaces(
             "FFFFFFFF FFFFFFFF C90FDAA2 2168C234 C4C6628B 80DC1CD1 " +
                     "29024E08 8A67CC74 020BBEA6 3B139B22 514A0879 8E3404DD " +
@@ -17,27 +19,29 @@ public class TextEncryption {
                     "15728E5A 8AACAA68 FFFFFFFF FFFFFFFF"), 16);
 
     public static String removeSpaces(String input) {
-        return input.replaceAll("\\s+","");
+        return input.replaceAll("\\s+", "");
     }
 
+    //define g
     private static final BigInteger g = new BigInteger("2");
 
     public static void main(String[] args) {
         String downloadPath = System.getProperty("user.home") + File.separator + "Downloads";
 
-        // Lese den öffentlichen Schlüssel aus der Datei pk.txt ein
+        //read public key from pk.txt
         BigInteger publicKey = readKeyFromFile(downloadPath + File.separator + "pk.txt");
 
-        // Lese den Text aus der Datei text.txt ein
+        // read text from text.txt
         String plainText = readTextFromFile(downloadPath + File.separator + "text.txt");
 
-        // Verschlüssele den Text gemäß dem ElGamal-Verfahren
+        // encrypt text
         String cipherText = encryptText(plainText, publicKey);
 
-        // Speichere die verschlüsselten Texte in der Datei chiffre.txt
+        // save encrypted text in chiffre.txt
         saveTextToFile(cipherText, downloadPath + File.separator + "chiffre.txt");
     }
 
+    //method to read key from pk.txt
     private static BigInteger readKeyFromFile(String filePath) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -45,12 +49,13 @@ public class TextEncryption {
             reader.close();
             return new BigInteger(keyString);
         } catch (IOException e) {
-            System.out.println("Fehler beim Lesen des Schlüssels aus der Datei '" + filePath + "'.");
+            System.out.println("error");
             e.printStackTrace();
             return null;
         }
     }
 
+    //method to read text from text.txt
     private static String readTextFromFile(String filePath) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -62,42 +67,45 @@ public class TextEncryption {
             reader.close();
             return sb.toString();
         } catch (IOException e) {
-            System.out.println("Fehler beim Lesen des Texts aus der Datei '" + filePath + "'.");
+            System.out.println("error");
             e.printStackTrace();
             return null;
         }
     }
 
+    //method to encrypt each character in text
     private static String encryptText(String plainText, BigInteger publicKey) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < plainText.length(); i++) {
             char c = plainText.charAt(i);
             int asciiCode = (int) c;
 
-            // Verschlüssle den ASCII-Code gemäß dem ElGamal-Verfahren
+            //encrypt message
             BigInteger message = new BigInteger(Integer.toString(asciiCode));
             BigInteger r = generateRandomNumberInRange(BigInteger.ONE, n.subtract(BigInteger.ONE));
             BigInteger c1 = g.modPow(r, n);
             BigInteger c2 = publicKey.modPow(r, n).multiply(message).mod(n);
 
-            // Füge die verschlüsselten Werte dem Ergebnisstring hinzu
+            // build final string
             sb.append("(").append(c1).append(",").append(c2).append(");");
         }
         return sb.toString();
     }
 
+    //method to save the final text to a new file
     private static void saveTextToFile(String text, String filePath) {
         try {
             FileWriter fileWriter = new FileWriter(filePath);
             fileWriter.write(text);
             fileWriter.close();
-            System.out.println("Die Verschlüsselung wurde erfolgreich in der Datei '" + filePath + "' gespeichert.");
+            System.out.println("Saved at '" + filePath);
         } catch (IOException e) {
-            System.out.println("Fehler beim Speichern der Verschlüsselung in der Datei '" + filePath + "'.");
+            System.out.println("error");
             e.printStackTrace();
         }
     }
 
+    //random number generator with BigInteger
     private static BigInteger generateRandomNumberInRange(BigInteger min, BigInteger max) {
         BigInteger range = max.subtract(min).add(BigInteger.ONE);
         BigInteger randomNumber;
